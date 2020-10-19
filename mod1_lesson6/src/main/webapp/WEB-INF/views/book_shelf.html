@@ -54,7 +54,7 @@
         </table>
     </form>
 
-    <form method="post" th:action="@{/books/remove}" th:object="${book}">
+    <form method="post" th:action="@{/books/remove}" th:object="${bookFilter}">
         <table>
             <tr>
                 <td>
@@ -76,7 +76,7 @@
         </table>
     </form>
 
-    <form method="get" th:action="@{/books/shelf}" th:object="${book}">
+    <form method="get" th:action="@{/books/shelf}" th:object="${bookFilter}">
         <table>
             <tr>
                 <td>

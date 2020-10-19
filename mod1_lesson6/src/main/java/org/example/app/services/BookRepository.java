@@ -2,6 +2,8 @@ package org.example.app.services;
 
 import org.apache.log4j.Logger;
 import org.example.web.dto.Book;
+import org.example.web.dto.BookFilter;
+import org.example.web.dto.Filter;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -18,25 +20,29 @@ public class BookRepository implements ProjectRepository<Book> {
         return new ArrayList<>(repo);
     }
 
-    private boolean isBookMatchesByParams(Book book, Book params) {
+    private boolean isBookMatchesByParams(Book book, BookFilter filter) {
         boolean isMatches = false;
 
-        Integer idToDelete = params.getId();
+        logger.info("isBookMatchesByParams filter: " + filter);
+
+        Integer idToDelete = filter.getId();
         if (book.getId().equals(idToDelete)) {
             isMatches = true;
         }
 
-        String authorToDelete = params.getAuthor();
+        String authorToDelete = filter.getAuthor();
+        logger.info("authorToDelete:" + authorToDelete);
         if (!authorToDelete.isEmpty()) {
             isMatches = book.getAuthor().matches("(.*)" + authorToDelete + "(.*)");
         }
 
-        String titleToDelete = params.getAuthor();
+        String titleToDelete = filter.getTitle();
+        logger.info("titleToDelete:" + titleToDelete);
         if (!titleToDelete.isEmpty()) {
             isMatches = book.getTitle().matches("(.*)" + titleToDelete + "(.*)");
         }
 
-        Integer sizeToDelete = params.getSize();
+        Integer sizeToDelete = filter.getSize();
         if (sizeToDelete != null) {
             isMatches = book.getSize().equals(sizeToDelete);
         }
@@ -45,11 +51,11 @@ public class BookRepository implements ProjectRepository<Book> {
     }
 
     @Override
-    public List<Book> retreiveFiltered(Book params) {
+    public List<Book> retreiveFiltered(Filter filter) {
         List<Book> result = new ArrayList<>();
 
         for (Book book : repo) {
-            if (params.isEmpty() || isBookMatchesByParams(book, params)) {
+            if (filter.isEmpty() || isBookMatchesByParams(book, (BookFilter) filter)) {
                 result.add(book);
             }
         }
@@ -77,10 +83,10 @@ public class BookRepository implements ProjectRepository<Book> {
     }
 
     @Override
-    public boolean removeItemByParams(Book params) {
-        logger.info("removeItemByParams: " + params);
+    public boolean removeItemByParams(Filter filter) {
+        logger.info("removeItemByParams: " + filter);
         for (Book book : retreiveAll()) {
-            if (isBookMatchesByParams(book, params)) {
+            if (isBookMatchesByParams(book, (BookFilter) filter)) {
                 repo.remove(book);
                 return true;
             }
